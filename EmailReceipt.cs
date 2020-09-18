@@ -4,6 +4,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using SendGrid.Helpers.Mail;
+using SendGrid;
 
 namespace AzureFunctionsDemo
 {
@@ -33,6 +34,11 @@ namespace AzureFunctionsDemo
             message.AddAttachment(filename: $"{recId}.txt", content: base64, type: "text/plain");
             // use custom created template made on sendgrid.com for sending HTML emails. You can also just use subject and content properties on message object
             message.SetTemplateId("d-a190fa8ce2864bb19866e36895a751ec");
+            message.AddCustomArg("Sender_name", "THis is a test Name");
+
+            
+
+            
 
             // only send if email isnt @test.com  - for testing purpses. 
              if(!email.EndsWith("@test.com"))

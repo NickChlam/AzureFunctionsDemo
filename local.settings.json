@@ -3,8 +3,8 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "SendGridApiKey" : "",
-        "EmailSender" : ""
+        "SendGridApiKey" : "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",
+        "EmailSender" : "Nick@krevaas.com"
 
     }
 }
