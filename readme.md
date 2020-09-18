@@ -46,4 +46,9 @@
 ``` c#
        [Table("payments", "payments", "{recId}")] RentalPayment payment,
 ```
-
+* Then the email is formatted and the attachment is conveted to base64.  We then send the email if the email does not end in @test.  I did this so I was nto constantly spamming myself with emails.  
+``` C#
+ if(!email.EndsWith("@test.com"))
+                sender.Add(message);
+```
+      
