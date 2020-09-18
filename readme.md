@@ -1,5 +1,5 @@
 Aure Function Workflow: 
-!image[Workflow of Azure Functions](https://krevaas.com/flow.png)
+![](https://krevaas.com/flow.png)
 
 <img
 src=“https://krevaas.com/flow.png”
