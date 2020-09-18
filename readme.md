@@ -45,5 +45,5 @@
 * using the Table attribute we can acccess data from Table Storage providng the table name, partition name, and table key.  We are getting the table key form the filename as we saved the filename as the tablekey name.  You can also using IBinder to bind the Table so we can find data at runtime if key wasnt accessible. 
 ``` c#
        [Table("payments", "payments", "{recId}")] RentalPayment payment,
-      ```
+```
 
