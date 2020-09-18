@@ -15,5 +15,5 @@
       }
  ```
 * I add a partitionKey and rowkey to the payment and add to the orderQue using the Que atrribute binding [Queue("payments")] IAsyncCollector<RentalPayment> orderQueue
-* I save to Azure Table Storage. Accomplished through the table Attribute Binding [Table("payments")] IAsyncCollector<RentalPayment> paymentTable
+* Then to Azure Table Storage. This is accomplished through the table Attribute Binding [Table("payments")] IAsyncCollector<RentalPayment> paymentTable
       
