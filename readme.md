@@ -1,9 +1,9 @@
-# Azure Functions Demo - 
-## Aure Function Workflow: 
+ # Azure Functions Demo - 
+## Azure Function Workflow: 
 ![](https://krevaas.com/flow.png)
 
 ### 1) Payment Web-hook -> OnRentalPaymentRecieved.cs
-* This function has an HTTPTrigger which desterilizes the body of the request as a \<RentalPayment\> 
+* This function has an HTTPTrigger which deserializes the body of the request as a \<RentalPayment\> 
 * This function is triggered (locally) when a Post request is made to **http://localhost:7071/api/OnRentalPaymentRecieved** with a body of:
 ```json
       {
@@ -34,7 +34,7 @@
             outputBlob.WriteLine($"Purchase Date: {DateTime.UtcNow}");
 ```
 ### 3) When a new item is added to BlobStorage (payments), Send Receipt to Customer - EmailReceipt.cs
-* This function is triggered when a new item enter blob storage at payments location via the Blob trigger attribute
+* This function is triggered when a new item enters blob storage at payments location via the Blob trigger attribute
 ``` c#
 [BlobTrigger("payments/{recId}.txt",
 ```
@@ -42,12 +42,12 @@
 ``` c#
 [SendGrid(ApiKey="SendGridApiKey")] ICollector<SendGridMessage> sender
 ```
-* Using SQL Server we can access data.  We are getting the paymentId from the filename.  
+* Using SQL Server, we can access data.  We are getting the paymentId from the filename.  
 ``` c#
         var data = DataAccess.LoadData<RentalPayment>(sql);
         var email = data[0].Email;
 ```
-*  The email is formatted, an attachment was added and is converted to base64.  We then send the email if the email does not end in @test.  I did this so I was not constantly spamming myself with emails.  
+*  The email is formatted; an attachment was added and is converted to base64.  We then send the email if the email does not end in @test.  I did this so I was not constantly spamming myself with emails.  
 ``` C#
  if(!email.EndsWith("@test.com"))
                 sender.Add(message);
@@ -67,7 +67,7 @@ ENV SendGridApiKey="YourSendGridAPIKey"
 ENV EmailSender="EMail@SetUpInSendGrid"
 ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Password=!passw0rd1985"
 ```
-6) run command - **docker-compose build** ( this may take a few minutes)
+6) run command - **docker-compose build** ( this may take a few minutes )
 7) this will build the image:  
       **functions with a TAG of 1.0**
 8) run **docker-compose up** 
@@ -125,7 +125,7 @@ azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4
 
 ```
 ### 3) View Data In SQL Server
-* While docker-compose is still running log into the dockers instance of SQL Server with SSMS or CLI ( ** never use default settings for productions envs **) 
+* While docker-compose is still running log into the dockers instance of SQL Server with Azure Data Studio, SSMS or CLI 
 ```
       Server name: localhost, 1433
       Authentication: SQL Server Authentication
@@ -150,4 +150,3 @@ azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4
       ```
       docker image rm $(docker images -aq)
       ```
-      
