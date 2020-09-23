@@ -79,7 +79,7 @@ ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Pas
 9) run **docker ps** in a new window to see what containers are running 
 
 ## Test everything works:
-1) open postman or make a post request to **http://localhost:8080/api/OnRentalPaymentRecieved** with the following body using your email address to see the reciept and email
+### 1) open postman or make a post request to **http://localhost:8080/api/OnRentalPaymentRecieved** with the following body using your email address to see the reciept and email
   ```
 {
        
@@ -91,7 +91,7 @@ ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Pas
 }
   ```
   
-2) Look at docker-compose output to see each function get triggered
+### 2) Look at docker-compose output to see each function get triggered - check your email for the message 
 ```
 azure_function_1  | info: Function.OnRentalPaymentRecieved[1]
 azure_function_1  |       Executing 'OnRentalPaymentRecieved' (Reason='This function was programmatically called via the 
@@ -124,4 +124,19 @@ azure_function_1  | info: Function.EmailReceipt[2]
 azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4daa-9c82-a03992368e0c, Duration=1179ms) 
 
 ```
+### 3) View Data In SQL Server
+* While docker-compose is still running log into the dockers instance of SQL Server with SSMS or CLI ( ** never use default settings for productions envs **) 
+```
+      Server name: localhost, 1433
+      Authentication: SQL Server Authentication
+            login: SA
+            password: !passw0rd1985
+```
+<img src = "https://krevaas.com/SQLConnection.PNG" width="50%">
+
+* See the data that was saved in the **master** db under the Payments table
+
+<img src = "https://krevaas.com/Data.PNG" width="50%">
+
+
 
