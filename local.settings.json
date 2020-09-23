@@ -1,10 +1,11 @@
 {
     "IsEncrypted": false,
     "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true;AccountName=devstoreaccount1",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "SendGridApiKey" : "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",
-        "EmailSender" : "Nick@krevaas.com"
+        "EmailSender" : "Nick@krevaas.com",
+        "ConnectionString" : "Server=localhost,1401; InitialCatalog=Test"
 
     }
 }
