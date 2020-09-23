@@ -69,7 +69,7 @@ ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Pas
 ```
 6) run command - **docker-compose build** ( this may take a few minutes)
 7) this will build the image:  
-  - functions with a TAG of 1.0
+      **functions with a TAG of 1.0**
 8) run **docker-compose up** 
   - this will create three containers and run them networked together. 
     - Creating sql-server-db ... done
