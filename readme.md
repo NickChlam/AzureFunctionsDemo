@@ -7,23 +7,23 @@
 * This function is triggered (locally) when a Post request is made to **http://localhost:7071/api/OnRentalPaymentRecieved** with a body of:
 ```json
       {
-        "PaymentId" : "5",
         "RentalUnitId" : "1",
         "CustomerId" : "1",
         "Email" : "emailAddress@gmail.com",
-        "PaymentAmount" : 9800.00
+        "PaymentAmount" : 9818.76,
+        "CustomerName" : "Keith Urban"
       }
  ```
-* I add a partition Key and row key to the payment and add to the order Queue using the Queue attribute binding [Queue("payments")] IAsyncCollector<RentalPayment> orderQueue
-* Then saved to Azure Table Storage. This is accomplished through the table Attribute Binding [Table("payments")] IAsyncCollector<RentalPayment> paymentTable
+* Add to the order Queue using the Queue attribute binding [Queue("payments")] IAsyncCollector<RentalPayment> orderQueue
+* Then saved to SQL Server using a very basic data layer in DataAccess.cs to manage connections to the db. 
       
-## 2) Consume Queue Message and create receipt in blob storage - GenerateReceipt.cs
+### 2) Consume Queue Message and create receipt in blob storage - GenerateReceipt.cs
 * This function is triggered when a new item enters the queue. Using the Que trigger attribute
      ```C#
      [QueueTrigger("payments", Connection = "AzureWebJobsStorage")]RentalPayment payment
     ```
 * Using the Interface IBinder as an attribute we can customize the binding at runtime 
-* Binding the BlobAttribute with a TextWriter, we can write a file to our Table Storage based on the Connection parameter **AzureWebJobsStorage** credential located in local.settings.json (this will be changed upon deployment) 
+* Binding the BlobAttribute with a TextWriter, we can write a file to Storage based on the Connection parameter **AzureWebJobsStorage** credential located in local.settings.json (this will be changed upon deployment) 
 * Using the Queue data from the queue trigger we can create the receipt in blob storage:
 ``` C#
             outputBlob.WriteLine($"Thank you for your payment");
@@ -33,7 +33,7 @@
             outputBlob.WriteLine($"Invoice Number: {payment.paymentId}");
             outputBlob.WriteLine($"Purchase Date: {DateTime.UtcNow}");
 ```
-## 3) When a new item is added to BlobStorage (payments), Send Receipt to Customer - EmailReceipt.cs
+### 3) When a new item is added to BlobStorage (payments), Send Receipt to Customer - EmailReceipt.cs
 * This function is triggered when a new item enter blob storage at payments location via the Blob trigger attribute
 ``` c#
 [BlobTrigger("payments/{recId}.txt",
@@ -42,17 +42,86 @@
 ``` c#
 [SendGrid(ApiKey="SendGridApiKey")] ICollector<SendGridMessage> sender
 ```
-* Using the Table attribute we can access data from Table Storage providing the table name, partition name, and table key.  We are getting the table key from the filename.   We saved the filename as the table key name.  You can also use IBinder to bind the Table so we can find data at runtime if key wasn’t accessible. 
+* Using SQL Server we can access data.  We are getting the paymentId from the filename.  
 ``` c#
-       [Table("payments", "payments", "{recId}")] RentalPayment payment,
+        var data = DataAccess.LoadData<RentalPayment>(sql);
+        var email = data[0].Email;
 ```
 *  The email is formatted, an attachment was added and is converted to base64.  We then send the email if the email does not end in @test.  I did this so I was not constantly spamming myself with emails.  
 ``` C#
  if(!email.EndsWith("@test.com"))
                 sender.Add(message);
 ```
-<<<<<<< HEAD
-      
-=======
-      
->>>>>>> 5a1376013e5d1063e86822ed95106fce3967b87e
+
+## Running in Docker:
+
+* This project can be run and tested all locally or in the cloud using Docker.  
+1) download docker desktop - https://www.docker.com/products/docker-desktop
+2) ensure you have docker installed - **docker --version**
+3) ensure you have docker-compose - **docker-compose --version** 
+4) move to the base directory of the project containing the docker-compose.yml file
+5) Add your ENV vars to Dockerfile in root directory
+```
+ENV AzureWebJobsStorage="UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azureite"
+ENV SendGridApiKey="YourSendGridAPIKey"
+ENV EmailSender="EMail@SetUpInSendGrid"
+ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Password=!passw0rd1985"
+```
+6) run command - **docker-compose build** ( this may take a few minutes)
+7) this will build the image:  
+  - functions with a TAG of 1.0
+8) run **docker-compose up** 
+  - this will create three containers and run them networked together. 
+    - Creating sql-server-db ... done
+    - Creating azurefunctionsdemo_azureite_1 ... done
+    - Creating azurefunctionsdemo_azure_function_1 ... done
+  
+9) run **docker ps** in a new window to see what containers are running 
+
+## Test everything works:
+1) open postman or make a post request to **http://localhost:8080/api/OnRentalPaymentRecieved** with the following body using your email address to see the reciept and email
+  ```
+{
+       
+        "RentalUnitId" : "3",
+        "CustomerId" : "22",
+        "Email" : "YourEmail@gmail.com",
+        "PaymentAmount" : 2368.11,
+        "CustomerName" : "Keith Urban"
+}
+  ```
+  
+2) Look at docker-compose output to see each function get triggered
+```
+azure_function_1  | info: Function.OnRentalPaymentRecieved[1]
+azure_function_1  |       Executing 'OnRentalPaymentRecieved' (Reason='This function was programmatically called via the 
+host APIs.', Id=9c9383af-a644-488e-968d-80dae2e81a9f)
+azure_function_1  | info: Function.OnRentalPaymentRecieved.User[0]
+azure_function_1  |       HTTP trigger function triggered
+...
+
+azure_function_1  |       Executed 'OnRentalPaymentRecieved' (Succeeded, Id=9c9383af-a644-488e-968d-80dae2e81a9f, Duration=1662ms)
+```
+
+```
+azure_function_1  | info: Function.GenerateReceipt[1]
+azure_function_1  |       Executing 'GenerateReceipt' (Reason='New queue message detected on 'payments'.', Id=8ff36d1d-a968-4355-808a-d3a9fe105950)
+azure_function_1  | info: Function.GenerateReceipt[0]
+azure_function_1  |       Trigger Details: MessageId: 51a896c4-c058-432b-a3bf-f2478fd23a63, DequeueCount: 1, InsertionTime: 09/23/2020 15:50:09 +00:00
+
+zure_function_1  | info: Function.GenerateReceipt.User[0]
+azure_function_1  |       Queue trigger function processed and created invoice for invoice Id: 1
+
+azure_function_1  | info: Function.GenerateReceipt[2]
+azure_function_1  |       Executed 'GenerateReceipt' (Succeeded, Id=8ff36d1d-a968-4355-808a-d3a9fe105950, Duration=524ms)
+```
+
+```
+azure_function_1  | info: Function.EmailReceipt[1]
+azure_function_1  |       Executing 'EmailReceipt' (Reason='New blob detected: payments/1.txt', Id=ab68cc4d-5814-4daa-9c82-a03992368e0c)
+
+azure_function_1  | info: Function.EmailReceipt[2]
+azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4daa-9c82-a03992368e0c, Duration=1179ms) 
+
+```
+
