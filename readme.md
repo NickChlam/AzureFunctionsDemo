@@ -148,6 +148,6 @@ azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4
       ```
 * delete all images 
       ```
-      docker images rm $(docker images -aq)
+      docker image rm $(docker images -aq)
       ```
       
