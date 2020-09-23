@@ -139,4 +139,15 @@ azure_function_1  |       Executed 'EmailReceipt' (Succeeded, Id=ab68cc4d-5814-4
 <img src = "https://krevaas.com/Data.PNG" width="50%">
 
 
+# Clean up!
 
+* ctrl+c to stop docker-compose
+* remove all containers 
+      ```
+      docker rm $(docker ps -aq)
+      ```
+* delete all images 
+      ```
+      docker images rm $(docker images -aq)
+      ```
+      
