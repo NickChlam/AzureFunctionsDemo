@@ -12,7 +12,7 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
 ENV AzureWebJobsStorage="UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://azureite"
-ENV SendGridApiKey="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"
+ENV SendGridApiKey="API_KEY_HERE"
 ENV EmailSender="Nick@krevaas.com"
 ENV  ConnectionString="Server=sql-server-db,1433; Database=Master;User Id=SA;Password=!passw0rd1985"
 
